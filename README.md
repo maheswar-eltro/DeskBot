@@ -36,7 +36,7 @@ Initial component exploration during the development of DeskBot. Some components
 - Motion-responsive behaviour using the MPU6050.
 - Inactivity-based sleepy state and wake-up responses.
 
-![DeskBot companion display](assets/images/features/companion-display.gif)
+![DeskBot interactive OLED companion](assets/images/features/companion-display.gif)
 
 ### 2. Real-Time Audio Spectrum Analyzer
 
@@ -66,7 +66,7 @@ Three monochrome visual experiments:
 - Boundary and particle collision handling.
 - Damping and particle-scattering interaction.
 
-![DeskBot tilt-controlled physics simulator](assets/images/features/particle-simulator.gif)
+![DeskBot particle simulator](assets/images/features/particle-simulator.gif)
 
 ### 5. Voice Mimic
 
@@ -125,8 +125,8 @@ The ESP32-C3 coordinates the different hardware peripherals and application func
    +----+----+     +----+----+      Push Buttons
    |         |     |         |
   OLED    MPU6050 INMP441  MAX98357A
-                           |
-                         Speaker
+                              |
+                           Speaker
 ```
 
 ### Operating Modes
@@ -140,7 +140,66 @@ DeskBot combines four primary operating modes:
 
 The integrated firmware also includes voice-mimic functionality.
 
-For a detailed explanation, see [`documentation/system-architecture.md`](documentation/system-architecture.md).
+For a detailed explanation, see [System Architecture](documentation/system-architecture.md).
+
+---
+
+## Custom PCB Design
+
+A dedicated two-layer PCB was designed using KiCad to consolidate the hardware connections.
+
+### Circuit Schematic
+
+The complete circuit schematic illustrates the electrical connections between the ESP32-C3 and the connected peripherals.
+
+![DeskBot circuit schematic](assets/images/pcb/schematic.png)
+
+### PCB Layout
+
+The following views show the top and bottom PCB layouts.
+
+| Top Layer | Bottom Layer |
+|:---:|:---:|
+| ![PCB top view](assets/images/pcb/pcb-top.png) | ![PCB bottom view](assets/images/pcb/pcb-bottom.png) |
+
+### 3D PCB Model
+
+3D renders provide a visual representation of the board and its component arrangement.
+
+| Front View | Back View | Side View |
+|:---:|:---:|:---:|
+| ![PCB 3D front view](assets/images/pcb/pcb-3d-front.png) | ![PCB 3D back view](assets/images/pcb/pcb-3d-back.png) | ![PCB 3D Side View](assets/images/pcb/pcb-3d-tilted.png) |
+
+### PCB Specifications
+
+| Parameter | Specification |
+|---|---|
+| Design software | KiCad 10 |
+| Board dimensions | 74.55 × 60.55 mm |
+| Copper layers | 2 |
+| Board thickness | 1.6 mm |
+| Substrate | FR4 |
+| Grounding | GND copper zones on both layers |
+
+The PCB provides dedicated connections for the ESP32-C3, OLED, microphone, amplifier, MPU6050 and push buttons.
+
+### Design Verification
+
+The initial KiCad Design Rule Check reported:
+
+- 0 PCB violations.
+- 0 unconnected items.
+- 1 extra-footprint schematic-parity warning associated with the PCB logo.
+- 5 ignored tests.
+
+The PCB design and manufacturing files have been prepared. Physical fabrication, assembly and validation remain pending.
+
+**PCB Resources:**
+
+- [Editable KiCad Project](hardware/pcb/kicad/)
+- [Gerber Manufacturing Files](hardware/pcb/gerbers/)
+- [PCB Documentation](hardware/pcb/README.md)
+- [Detailed PCB Design Notes](documentation/pcb-design.md)
 
 ---
 
@@ -162,12 +221,18 @@ DeskBot/
 │       │   ├── audio-spectrum.jpg
 │       │   ├── companion-display.gif
 │       │   ├── companion-display.jpg
-│       │   ├── oled-animation.gif
-│       │   ├── oled-animation.jpg
 │       │   ├── particle-simulator.gif
 │       │   ├── particle-simulator.jpg
 │       │   ├── visual-experiment.gif
 │       │   └── visual-experiment.jpg
+│       │
+│       ├── pcb/
+│       │   ├── schematic.png
+│       │   ├── pcb-top.png
+│       │   ├── pcb-bottom.png
+│       │   ├── pcb-3d-front.png
+│       │   └── pcb-3d-back.png
+│       │   └── pcb-3d-tilted.png
 │       │
 │       └── early-hardware-components.jpeg
 │
@@ -185,25 +250,11 @@ DeskBot/
 │   │
 │   └── pcb/
 │       ├── README.md
-│       │
-│       ├── kicad/
-│       │   ├── pilot.kicad_pro
-│       │   ├── pilot.kicad_sch
-│       │   └── pilot.kicad_pcb
-│       │
-│       └── gerbers/
-│           ├── pilot-B_Cu.gbr
-│           ├── pilot-B_Mask.gbr
-│           ├── pilot-B_Paste.gbr
-│           ├── pilot-B_Silkscreen.gbr
-│           ├── pilot-Edge_Cuts.gbr
-│           ├── pilot-F_Cu.gbr
-│           ├── pilot-F_Mask.gbr
-│           ├── pilot-F_Paste.gbr
-│           ├── pilot-F_Silkscreen.gbr
-│           ├── pilot-NPTH.drl
-│           ├── pilot-PTH.drl
-│           └── pilot-job.gbrjob
+│       ├── gerbers/
+│       └── kicad/
+│           ├── pilot.kicad_pcb
+│           ├── pilot.kicad_pro
+│           └── pilot.kicad_sch
 │
 └── src/
     ├── main/
@@ -218,8 +269,10 @@ DeskBot/
         ├── audio/
         │   ├── MAX98/
         │   └── mic/
+        │
         ├── display/
         │   └── OLED/
+        │
         └── sensors/
             └── mpu6050/
 ```
@@ -228,11 +281,11 @@ DeskBot/
 
 | Directory | Purpose |
 |---|---|
-| `assets/images/` | Prototype photographs and feature demonstrations |
+| `assets/images/` | Prototype photographs, feature demonstrations and PCB previews |
 | `documentation/` | Design decisions, engineering notes, architecture and progress |
 | `hardware/` | Component inventory, pinout, wiring and PCB resources |
 | `hardware/pcb/kicad/` | Editable KiCad project files |
-| `hardware/pcb/gerbers/` | PCB manufacturing and drill files |
+| `hardware/pcb/gerbers/` | PCB manufacturing outputs |
 | `src/main/bot/` | Main firmware and integrated prototype |
 | `src/main/bot/mimic/` | Independent voice-mimic implementations |
 | `src/tests/` | Standalone hardware experiments and peripheral tests |
@@ -278,53 +331,18 @@ The standalone test sketches can be found under `src/tests/`.
 
 ---
 
-## Custom PCB Design
-
-A dedicated two-layer PCB was designed using KiCad to consolidate the hardware connections.
-
-### PCB Specifications
-
-| Parameter | Specification |
-|---|---|
-| Design software | KiCad 10 |
-| Board dimensions | 74.55 × 60.55 mm |
-| Copper layers | 2 |
-| Board thickness | 1.6 mm |
-| Substrate | FR4 |
-| Grounding | GND copper zones on both layers |
-
-The PCB provides dedicated connections for the ESP32-C3, OLED, microphone, amplifier, MPU6050 and push buttons.
-
-### Design Verification
-
-The initial KiCad Design Rule Check reported:
-
-- 0 PCB violations.
-- 0 unconnected items.
-- 1 extra-footprint schematic-parity warning associated with the PCB logo.
-- 5 ignored tests.
-
-The PCB design and manufacturing files have been prepared. Physical fabrication, assembly and validation remain pending.
-
-For additional information, see [`documentation/pcb-design.md`](documentation/pcb-design.md).
-
-The editable KiCad project and manufacturing exports are available in [`hardware/pcb/`](hardware/pcb/).
-
----
-
 ## Documentation
 
 | Document | Description |
 |---|---|
-| [`design.md`](documentation/design.md) | Design philosophy, objectives and engineering decisions |
-| [`notes.md`](documentation/notes.md) | Technical concepts and development learnings |
-| [`progress.md`](documentation/progress.md) | Development milestones and project status |
-| [`system-architecture.md`](documentation/system-architecture.md) | Firmware architecture and operating modes |
-| [`pcb-design.md`](documentation/pcb-design.md) | Custom PCB design and verification |
-| [`components.md`](hardware/components.md) | Hardware component inventory |
-| [`pinout.md`](hardware/pinout.md) | ESP32-C3 and peripheral pin assignments |
-| [`wiring.md`](hardware/wiring.md) | Electrical connections and communication interfaces |
-| [`PCB resources`](hardware/pcb/README.md) | KiCad project and manufacturing files |
+| [design.md](documentation/design.md) | Design philosophy, objectives and engineering decisions |
+| [notes.md](documentation/notes.md) | Technical concepts and development learnings |
+| [progress.md](documentation/progress.md) | Development milestones and project status |
+| [system-architecture.md](documentation/system-architecture.md) | Firmware architecture and operating modes |
+| [pcb-design.md](documentation/pcb-design.md) | Custom PCB design and verification |
+| [components.md](hardware/components.md) | Hardware component inventory |
+| [pinout.md](hardware/pinout.md) | ESP32-C3 and peripheral pin assignments |
+| [wiring.md](hardware/wiring.md) | Electrical connections and communication interfaces |
 
 ---
 
