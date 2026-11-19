@@ -1,144 +1,370 @@
-# DeskBot Companion 
+# DeskBot — ESP32-C3 Interactive Desktop Companion
 
-An expressive, interactive mini desk robot built around the ESP32-C3, combining animated OLED eyes, motion sensing, touch interaction, audio input/output, and servo-driven head movement.
+An interactive embedded desktop companion built around the ESP32-C3 Super Mini, combining animated OLED expressions, digital audio processing, motion sensing, real-time visualisation and physics simulation.
 
-The goal is to build a small robotic companion that can respond to its environment through movement, expressions, sounds, and user interaction.
+DeskBot explores the intersection of embedded systems, digital signal processing, sensor integration, real-time graphics and human–robot interaction.
+
+Rather than functioning as a conventional robotic vehicle, DeskBot incorporates multiple interactive experiences into a compact embedded platform.
+
+---
+
+## Project Gallery
+
+### Working Breadboard Prototype
+
+The initial DeskBot prototype, integrating the ESP32-C3, OLED display, digital audio hardware and speaker on a breadboard.
+
+![DeskBot working breadboard prototype](assets/images/prototype/deskbot-prototype.jpg)
+
+![DeskBot prototype — alternate view](assets/images/prototype/deskbot-prototype2.jpg)
+
+### Early Hardware Exploration
+
+Initial component exploration during the development of DeskBot. Some components shown here were part of earlier experiments and are not included in the current hardware configuration.
+
+![Early DeskBot hardware components](assets/images/early-hardware-components.jpeg)
+
+---
 
 ## Features
 
-* **Animated expressions:** Display expressive eyes and facial animations on a 0.96-inch SSD1306 OLED.
-* **Motion sensing:** Use the MPU6050 accelerometer and gyroscope to detect movement and orientation changes.
-* **Touch interaction:** Use a TTP223 capacitive touch sensor to trigger reactions.
-* **Audio input:** Capture sound through the INMP441 digital MEMS microphone.
-* **Audio output:** Play sounds through a MAX98357A amplifier and speaker.
-* **Head movement:** Use two SG90-type servo motors for expressive movement.
-* **Sound effects:** Use a buzzer for beeps and simple alerts.
-* **Integrated behaviour:** Combine sensor inputs, expressions, sounds, and movement through the ESP32-C3.
+### 1. Interactive OLED Companion
 
-*Features will be implemented and tested incrementally.*
+- Animated facial expressions using a 0.96-inch SSD1306 OLED.
+- Sound-triggered reactions.
+- Clap detection and double-clap interaction.
+- Motion-responsive behaviour using the MPU6050.
+- Inactivity-based sleepy state and wake-up responses.
 
-## Hardware Components
+![DeskBot companion display](assets/images/features/companion-display.gif)
 
-| Component                      | Purpose                                    |
-| ------------------------------ | ------------------------------------------ |
-| ESP32-C3 development board     | Main controller                            |
-| SSD1306 0.96-inch OLED, 128×64 | Animated eyes and expressions              |
-| MPU6050 IMU                    | Acceleration and rotational motion sensing |
-| TTP223 touch sensor            | Capacitive touch detection                 |
-| INMP441 microphone             | Digital audio input                        |
-| MAX98357A amplifier            | I²S audio output amplification             |
-| 4 Ω, 3 W speaker               | Sound output                               |
-| 2 × SG90-type servos           | Head movement                              |
-| Buzzer                         | Beeps and sound effects                    |
-| Breadboard and jumper wires    | Prototyping and circuit connections        |
-| Perfboard                      | Final circuit assembly                     |
+### 2. Real-Time Audio Spectrum Analyzer
 
-## System Overview
+- Live audio acquisition through the INMP441 microphone.
+- Custom radix-2 Cooley-Tukey FFT implementation.
+- Mean removal and Hann windowing.
+- 16-band frequency visualisation.
+- Dynamic spectrum bars and peak-hold indicators.
 
-The ESP32-C3 acts as the central controller and coordinates the robot's peripherals.
+![DeskBot audio spectrum analyser](assets/images/features/audio-spectrum.gif)
 
-* **I²C:** Communication with the OLED display and MPU6050.
-* **I²S:** Digital audio communication with the INMP441 microphone and MAX98357A amplifier.
-* **Digital GPIO:** Touch sensor and buzzer control.
-* **PWM-capable GPIO:** Servo position control.
+### 3. Optical Illusion Engine
 
-The OLED and MPU6050 can share the I²C bus when configured with distinct addresses. The microphone and audio amplifier use I²S rather than I²C.
+Three monochrome visual experiments:
 
-Final GPIO assignments and power connections will be documented after hardware testing.
+- **Rubin's Vase:** Figure-ground perception illusion.
+- **Hypnotic Tunnel:** Animated concentric-circle visualisation.
+- **Hermann Grid:** Grid-based optical illusion.
+
+![DeskBot optical illusion engine](assets/images/features/visual-experiment.gif)
+
+### 4. Tilt-Controlled Physics Simulator
+
+- 40-particle simulation.
+- MPU6050-based tilt interaction.
+- Velocity-based particle movement.
+- Boundary and particle collision handling.
+- Damping and particle-scattering interaction.
+
+![DeskBot tilt-controlled physics simulator](assets/images/features/particle-simulator.gif)
+
+### 5. Voice Mimic
+
+Two independent implementations exploring audio recording and playback:
+
+| Implementation | Recording Duration | PCM Format | Sampling Rate |
+|---|---:|---|---:|
+| 5-second version | 5 seconds | 16-bit mono | 16 kHz |
+| 10-second version | 10 seconds | 8-bit mono | 16 kHz |
+
+Both implementations use the INMP441 microphone and MAX98357A audio amplifier.
+
+---
+
+## Hardware
+
+The ESP32-C3 Super Mini acts as the central controller.
+
+| Component | Function |
+|---|---|
+| ESP32-C3 Super Mini | Main controller |
+| SSD1306 OLED, 128×64 | Visual output and animations |
+| MPU6050 | Accelerometer and gyroscope |
+| INMP441 | Digital MEMS microphone |
+| MAX98357A | I2S audio amplifier |
+| 4Ω speaker | Audio output |
+| 2 × Push Buttons | Physical user interaction |
+
+### Communication Interfaces
+
+| Interface | Connected Hardware | Purpose |
+|---|---|---|
+| I2C | OLED, MPU6050 | Display and sensor communication |
+| I2S | INMP441, MAX98357A | Digital audio input and output |
+| GPIO | Push buttons | User input |
+
+### Power
+
+The working breadboard prototype uses a USB power bank connected to the ESP32-C3 through USB-C.
+
+The hardware design uses 5V and 3.3V power rails with a common ground reference.
+
+---
+
+## System Architecture
+
+The ESP32-C3 coordinates the different hardware peripherals and application functions.
+
+```text
+                    ESP32-C3
+                        |
+        +---------------+---------------+
+        |               |               |
+       I2C             I2S             GPIO
+        |               |               |
+   +----+----+     +----+----+      Push Buttons
+   |         |     |         |
+  OLED    MPU6050 INMP441  MAX98357A
+                           |
+                         Speaker
+```
+
+### Operating Modes
+
+DeskBot combines four primary operating modes:
+
+1. **Interactive Companion** — Animated expressions and sound/motion-based reactions.
+2. **Audio Spectrum Analyzer** — Real-time frequency-domain visualisation.
+3. **Optical Illusion Engine** — Three monochrome visual experiments.
+4. **Physics Simulator** — Tilt-controlled particle simulation.
+
+The integrated firmware also includes voice-mimic functionality.
+
+For a detailed explanation, see [`documentation/system-architecture.md`](documentation/system-architecture.md).
+
+---
 
 ## Repository Structure
 
 ```text
-mini-robot-companion/
+DeskBot/
+│
 ├── README.md
+│
+├── assets/
+│   └── images/
+│       ├── prototype/
+│       │   ├── deskbot-prototype.jpg
+│       │   └── deskbot-prototype2.jpg
+│       │
+│       ├── features/
+│       │   ├── audio-spectrum.gif
+│       │   ├── audio-spectrum.jpg
+│       │   ├── companion-display.gif
+│       │   ├── companion-display.jpg
+│       │   ├── oled-animation.gif
+│       │   ├── oled-animation.jpg
+│       │   ├── particle-simulator.gif
+│       │   ├── particle-simulator.jpg
+│       │   ├── visual-experiment.gif
+│       │   └── visual-experiment.jpg
+│       │
+│       └── early-hardware-components.jpeg
+│
 ├── documentation/
-│   ├── notes.md
 │   ├── design.md
-│   └── progress.md
+│   ├── notes.md
+│   ├── pcb-design.md
+│   ├── progress.md
+│   └── system-architecture.md
+│
 ├── hardware/
 │   ├── components.md
-│   └── wiring.md
+│   ├── pinout.md
+│   ├── wiring.md
+│   │
+│   └── pcb/
+│       ├── README.md
+│       │
+│       ├── kicad/
+│       │   ├── pilot.kicad_pro
+│       │   ├── pilot.kicad_sch
+│       │   └── pilot.kicad_pcb
+│       │
+│       └── gerbers/
+│           ├── pilot-B_Cu.gbr
+│           ├── pilot-B_Mask.gbr
+│           ├── pilot-B_Paste.gbr
+│           ├── pilot-B_Silkscreen.gbr
+│           ├── pilot-Edge_Cuts.gbr
+│           ├── pilot-F_Cu.gbr
+│           ├── pilot-F_Mask.gbr
+│           ├── pilot-F_Paste.gbr
+│           ├── pilot-F_Silkscreen.gbr
+│           ├── pilot-NPTH.drl
+│           ├── pilot-PTH.drl
+│           └── pilot-job.gbrjob
+│
 └── src/
     ├── main/
-    │   └── mini_robot.ino
+    │   └── bot/
+    │       ├── eyes/
+    │       ├── mimic/
+    │       │   ├── 5secs/
+    │       │   └── 10secs/
+    │       └── proto/
+    │
     └── tests/
-        ├── display/
-        │   └── oled_test.ino
-        ├── sensors/
-        │   ├── mpu6050_test.ino
-        │   └── touch_test.ino
         ├── audio/
-        │   ├── microphone_test.ino
-        │   └── speaker_test.ino
-        └── servos/
-            └── servo_test.ino
+        │   ├── MAX98/
+        │   └── mic/
+        ├── display/
+        │   └── OLED/
+        └── sensors/
+            └── mpu6050/
 ```
 
 ### Directory Guide
 
-* `documentation/` — Technical notes, design decisions, and development progress.
-* `hardware/` — Component inventory and wiring information.
-* `src/main/` — Integrated firmware for the complete robot.
-* `src/tests/` — Independent sketches for testing individual hardware modules.
+| Directory | Purpose |
+|---|---|
+| `assets/images/` | Prototype photographs and feature demonstrations |
+| `documentation/` | Design decisions, engineering notes, architecture and progress |
+| `hardware/` | Component inventory, pinout, wiring and PCB resources |
+| `hardware/pcb/kicad/` | Editable KiCad project files |
+| `hardware/pcb/gerbers/` | PCB manufacturing and drill files |
+| `src/main/bot/` | Main firmware and integrated prototype |
+| `src/main/bot/mimic/` | Independent voice-mimic implementations |
+| `src/tests/` | Standalone hardware experiments and peripheral tests |
 
-Test sketches will be added as each subsystem is developed.
+---
 
-## Development Setup
+## Getting Started
 
 ### Requirements
 
-* Arduino IDE or a compatible development environment.
-* ESP32 board support package.
-* USB data cable compatible with the development board.
-* Appropriate libraries for the OLED, MPU6050, and other peripherals used in the firmware.
+- Arduino IDE or compatible development environment.
+- ESP32 board support package.
+- ESP32-C3 Super Mini.
+- USB-C data cable.
+- Required peripheral libraries used by the firmware.
 
-### Getting Started
+### Running the Firmware
 
-1. Clone or download this repository.
-2. Install the ESP32 board support package in Arduino IDE.
-3. Connect the ESP32-C3 and select the correct board and serial port.
-4. Open an individual test sketch from `src/tests/`.
-5. Verify each component independently before integrating it into `src/main/mini_robot.ino`.
-6. Refer to `hardware/wiring.md` for the verified connections.
+1. Clone or download the repository.
+2. Install the ESP32 board support package.
+3. Connect the ESP32-C3 using a USB-C data cable.
+4. Select the appropriate ESP32-C3 board configuration and serial port.
+5. Open the desired `.ino` file from the source directory.
+6. Install any required libraries referenced by that sketch.
+7. Compile and upload the firmware.
 
-Library choices, board configuration, and pin assignments will be documented as the firmware develops.
+### Main Firmware
 
-## Power and Safety Considerations
+The integrated prototype is located at:
 
-* Servos should use a suitable regulated supply capable of handling their current demand.
-* Do not power servos directly from ESP32 GPIO pins.
-* Connect grounds appropriately between the controller, peripherals, and external supplies.
-* Verify the operating-voltage requirements of each module before connecting it.
-* Check the battery voltage, regulator capacity, and total current requirements before final assembly.
-* Test the circuit on a breadboard before transferring it to perfboard.
+`src/main/bot/proto/proto.ino`
 
-The final power-distribution and battery arrangements will be documented after testing.
+### Voice Mimic Implementations
 
-## Development Roadmap
+The independent implementations are located at:
 
-* [ ] Verify ESP32-C3 board configuration and GPIO availability.
-* [ ] Test OLED display and basic eye animations.
-* [ ] Test MPU6050 motion readings.
-* [ ] Test TTP223 touch detection.
-* [ ] Capture audio samples from the INMP441 microphone.
-* [ ] Test audio output through the MAX98357A and speaker.
-* [ ] Test both servos independently.
-* [ ] Verify buzzer operation.
-* [ ] Finalize wiring and power distribution.
-* [ ] Integrate the tested modules into the main firmware.
-* [ ] Develop coordinated expressions, movement, and sound responses.
-* [ ] Assemble and test the complete robot.
+- `src/main/bot/mimic/5secs/5secs.ino`
+- `src/main/bot/mimic/10secs/10secs.ino`
+
+The standalone test sketches can be found under `src/tests/`.
+
+**Note:** The integrated prototype and individual test sketches are separate firmware programs. Upload the sketch corresponding to the functionality you want to test.
+
+---
+
+## Custom PCB Design
+
+A dedicated two-layer PCB was designed using KiCad to consolidate the hardware connections.
+
+### PCB Specifications
+
+| Parameter | Specification |
+|---|---|
+| Design software | KiCad 10 |
+| Board dimensions | 74.55 × 60.55 mm |
+| Copper layers | 2 |
+| Board thickness | 1.6 mm |
+| Substrate | FR4 |
+| Grounding | GND copper zones on both layers |
+
+The PCB provides dedicated connections for the ESP32-C3, OLED, microphone, amplifier, MPU6050 and push buttons.
+
+### Design Verification
+
+The initial KiCad Design Rule Check reported:
+
+- 0 PCB violations.
+- 0 unconnected items.
+- 1 extra-footprint schematic-parity warning associated with the PCB logo.
+- 5 ignored tests.
+
+The PCB design and manufacturing files have been prepared. Physical fabrication, assembly and validation remain pending.
+
+For additional information, see [`documentation/pcb-design.md`](documentation/pcb-design.md).
+
+The editable KiCad project and manufacturing exports are available in [`hardware/pcb/`](hardware/pcb/).
+
+---
 
 ## Documentation
 
-* `documentation/notes.md` — Learning notes and technical concepts.
-* `documentation/design.md` — System architecture and design decisions.
-* `documentation/progress.md` — Milestones, completed tests, and development updates.
-* `hardware/components.md` — Component list and specifications.
-* `hardware/wiring.md` — Pin assignments, wiring diagrams, and power connections.
+| Document | Description |
+|---|---|
+| [`design.md`](documentation/design.md) | Design philosophy, objectives and engineering decisions |
+| [`notes.md`](documentation/notes.md) | Technical concepts and development learnings |
+| [`progress.md`](documentation/progress.md) | Development milestones and project status |
+| [`system-architecture.md`](documentation/system-architecture.md) | Firmware architecture and operating modes |
+| [`pcb-design.md`](documentation/pcb-design.md) | Custom PCB design and verification |
+| [`components.md`](hardware/components.md) | Hardware component inventory |
+| [`pinout.md`](hardware/pinout.md) | ESP32-C3 and peripheral pin assignments |
+| [`wiring.md`](hardware/wiring.md) | Electrical connections and communication interfaces |
+| [`PCB resources`](hardware/pcb/README.md) | KiCad project and manufacturing files |
+
+---
+
+## Development Status
+
+| Subsystem | Status |
+|---|---|
+| OLED companion | Implemented and prototype-tested |
+| Audio spectrum analyser | Implemented |
+| Optical illusion engine | Implemented |
+| Physics simulator | Implemented |
+| Voice mimic | Two independent implementations |
+| Integrated firmware | Working prototype |
+| Custom PCB | Designed |
+| PCB fabrication | Pending |
+| PCB assembly and validation | Pending |
+
+---
+
+## Engineering Areas Explored
+
+DeskBot provides practical experience in:
+
+- Embedded C/C++ programming.
+- ESP32-C3 development.
+- I2C and I2S communication.
+- Digital audio acquisition and playback.
+- Digital signal processing and FFT.
+- Sensor integration and motion detection.
+- Real-time graphics and OLED animation.
+- Mathematical physics simulation.
+- Memory management in resource-constrained systems.
+- PCB schematic capture and layout using KiCad.
+
+---
 
 ## Project Goal
 
-The objective is to build a compact robotic companion that demonstrates embedded systems, sensor integration, digital audio, motion control, and expressive human–robot interaction.
+The objective of DeskBot is to develop a compact interactive embedded companion that brings together audio processing, motion sensing, visualisation and expressive behaviour.
 
-This project is being developed incrementally, with individual hardware testing followed by firmware integration and final assembly.
+The project demonstrates how independently developed hardware and software subsystems can be integrated into a unified embedded platform.
+
+**DeskBot is an ongoing engineering project**, with further work focused on PCB fabrication, physical assembly, system validation and firmware improvements.
